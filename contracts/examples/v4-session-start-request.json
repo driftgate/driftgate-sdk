@@ -1,0 +1,16 @@
+{
+  "agent": "refund-agent",
+  "workspaceId": "ws_demo_1",
+  "policy": {
+    "ref": "default",
+    "version": "latest"
+  },
+  "route": {
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "region": "us-east-1"
+  },
+  "metadata": {
+    "channel": "sdk"
+  }
+}

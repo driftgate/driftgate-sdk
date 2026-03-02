@@ -1,0 +1,461 @@
+openapi: 3.0.3
+info:
+  title: DriftGate Headless Runtime API
+  version: 1.0.0
+  description: |
+    Canonical additive contract for DriftGate headless runtime consumers (SDK/CLI/hosted).
+servers:
+  - url: https://api.driftgate.ai
+security:
+  - bearerAuth: []
+  - apiKeyAuth: []
+paths:
+  /v1/headless/workflows/deploy:
+    post:
+      summary: Deploy workflow.yaml into draft workflow state
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeployWorkflowRequest"
+      responses:
+        "201":
+          description: Workflow draft deployed
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StructuredErrorEnvelope"
+  /v1/headless/workflows/{workflowId}/publish:
+    post:
+      summary: Publish workflow version
+      parameters:
+        - $ref: "#/components/parameters/WorkflowId"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublishWorkflowRequest"
+      responses:
+        "201":
+          description: Published workflow version
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StructuredErrorEnvelope"
+  /v1/headless/runs:
+    post:
+      summary: Create governed run
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HeadlessRunRequest"
+            examples:
+              default:
+                value:
+                  workspaceId: ws_demo_1
+                  workflowVersionId: wv_demo_1
+                  requiresApproval: true
+                  requiredRole: approver
+                  slaPolicyId: sla_demo
+                  idempotencyKey: sdk-request-123
+                  correlationId: corr-123
+                  triggerSource: sdk
+                  input:
+                    amount: 100
+      responses:
+        "201":
+          description: Created governed run
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HeadlessRunResponse"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StructuredErrorEnvelope"
+  /v1/headless/runs/{runId}:
+    get:
+      summary: Get run and optional approval state
+      parameters:
+        - $ref: "#/components/parameters/RunId"
+      responses:
+        "200":
+          description: Run details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HeadlessRunStatusResponse"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StructuredErrorEnvelope"
+  /v1/headless/runs/{runId}/events:
+    get:
+      summary: List run timeline events
+      parameters:
+        - $ref: "#/components/parameters/RunId"
+      responses:
+        "200":
+          description: Run events
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RunEventsResponse"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StructuredErrorEnvelope"
+  /v1/headless/workspaces/{workspaceId}/approvals:
+    get:
+      summary: List approvals for workspace
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [pending, approved, denied]
+      responses:
+        "200":
+          description: Approval list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApprovalsListResponse"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StructuredErrorEnvelope"
+  /v1/headless/approvals/{approvalId}/approve:
+    post:
+      summary: Approve pending approval
+      parameters:
+        - $ref: "#/components/parameters/ApprovalId"
+      responses:
+        "200":
+          description: Updated run state after approval
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StructuredErrorEnvelope"
+  /v1/headless/approvals/{approvalId}/deny:
+    post:
+      summary: Deny pending approval
+      parameters:
+        - $ref: "#/components/parameters/ApprovalId"
+      responses:
+        "200":
+          description: Updated run state after denial
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StructuredErrorEnvelope"
+  /r/{tenantSlug}/{workspaceSlug}/{workflowSlug}:
+    post:
+      summary: Hosted run trigger endpoint
+      parameters:
+        - in: path
+          name: tenantSlug
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: workspaceSlug
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: workflowSlug
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HostedRunRequest"
+      responses:
+        "201":
+          description: Hosted run created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HeadlessRunResponse"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StructuredErrorEnvelope"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-driftgate-api-key
+  parameters:
+    WorkflowId:
+      in: path
+      name: workflowId
+      required: true
+      schema:
+        type: string
+    RunId:
+      in: path
+      name: runId
+      required: true
+      schema:
+        type: string
+    WorkspaceId:
+      in: path
+      name: workspaceId
+      required: true
+      schema:
+        type: string
+    ApprovalId:
+      in: path
+      name: approvalId
+      required: true
+      schema:
+        type: string
+  schemas:
+    TriggerSource:
+      type: string
+      enum: [ui, api, sdk, cli, hosted, webhook]
+    RunState:
+      type: string
+      enum:
+        - queued
+        - running
+        - waiting_approval
+        - approved
+        - denied
+        - succeeded
+        - failed
+        - aborted
+        - timed_out
+        - canceled
+    DeployWorkflowRequest:
+      type: object
+      required: [workspaceId, workflowYaml]
+      properties:
+        workspaceId:
+          type: string
+        projectId:
+          type: string
+        projectName:
+          type: string
+        workflowId:
+          type: string
+        workflowName:
+          type: string
+        workflowYaml:
+          type: string
+    PublishWorkflowRequest:
+      type: object
+      properties:
+        workflowYaml:
+          type: string
+    HeadlessRunRequest:
+      type: object
+      required: [workspaceId, workflowVersionId]
+      properties:
+        workspaceId:
+          type: string
+        workflowVersionId:
+          type: string
+        requiresApproval:
+          type: boolean
+        requiredRole:
+          type: string
+        slaPolicyId:
+          type: string
+        idempotencyKey:
+          type: string
+          minLength: 1
+          maxLength: 200
+        correlationId:
+          type: string
+          minLength: 1
+          maxLength: 200
+        triggerSource:
+          $ref: "#/components/schemas/TriggerSource"
+        input:
+          type: object
+          additionalProperties: true
+    HostedRunRequest:
+      type: object
+      properties:
+        requiresApproval:
+          type: boolean
+        requiredRole:
+          type: string
+        slaPolicyId:
+          type: string
+        idempotencyKey:
+          type: string
+          minLength: 1
+          maxLength: 200
+        correlationId:
+          type: string
+          minLength: 1
+          maxLength: 200
+        input:
+          type: object
+          additionalProperties: true
+    RunSummary:
+      type: object
+      required:
+        - id
+        - workspaceId
+        - workflowVersionId
+        - state
+        - requestedBy
+        - requestedAt
+        - correlationId
+        - triggerSource
+      properties:
+        id:
+          type: string
+        workspaceId:
+          type: string
+        workflowVersionId:
+          type: string
+        state:
+          $ref: "#/components/schemas/RunState"
+        requestedBy:
+          type: string
+        requestedAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        correlationId:
+          type: string
+        idempotencyKey:
+          type: string
+          nullable: true
+        triggerSource:
+          $ref: "#/components/schemas/TriggerSource"
+    ApprovalSummary:
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: string
+        runId:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved, denied]
+        requestedAt:
+          type: string
+          format: date-time
+    HeadlessRunResponse:
+      type: object
+      required: [run, blocked, policyDecisions, entitlementDecision, usageEntry]
+      properties:
+        run:
+          $ref: "#/components/schemas/RunSummary"
+        approval:
+          $ref: "#/components/schemas/ApprovalSummary"
+        blocked:
+          type: boolean
+        policyDecisions:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        entitlementDecision:
+          type: object
+          required: [id, reasonCode, reasonText, entitled]
+          properties:
+            id:
+              type: string
+            reasonCode:
+              type: string
+            reasonText:
+              type: string
+            entitled:
+              type: boolean
+        usageEntry:
+          type: object
+          required: [id, quantity]
+          properties:
+            id:
+              type: string
+            quantity:
+              type: integer
+    HeadlessRunStatusResponse:
+      type: object
+      required: [run]
+      properties:
+        run:
+          $ref: "#/components/schemas/RunSummary"
+        approval:
+          $ref: "#/components/schemas/ApprovalSummary"
+    RunEventsResponse:
+      type: object
+      required: [events]
+      properties:
+        events:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+    ApprovalsListResponse:
+      type: object
+      required: [approvals]
+      properties:
+        approvals:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApprovalSummary"
+    StructuredErrorEnvelope:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          enum:
+            - invalid_request
+            - unauthorized
+            - forbidden
+            - firewall_denied
+            - not_found
+            - conflict
+            - rate_limit_exceeded
+            - entitlement_denied
+            - internal_error
+        message:
+          type: string
+        correlation_id:
+          type: string
+        details:
+          nullable: true

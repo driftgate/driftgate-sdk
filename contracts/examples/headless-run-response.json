@@ -1,0 +1,32 @@
+{
+  "run": {
+    "id": "run_demo_1",
+    "workspaceId": "ws_demo_1",
+    "workflowVersionId": "wv_demo_1",
+    "state": "waiting_approval",
+    "requestedBy": "usr_demo_1",
+    "requestedAt": "2026-02-22T14:35:00.000Z",
+    "updatedAt": "2026-02-22T14:35:00.000Z",
+    "correlationId": "corr-123",
+    "idempotencyKey": "sdk-request-123",
+    "triggerSource": "sdk"
+  },
+  "approval": {
+    "id": "approval_demo_1",
+    "runId": "run_demo_1",
+    "status": "pending",
+    "requestedAt": "2026-02-22T14:35:00.000Z"
+  },
+  "blocked": false,
+  "policyDecisions": [],
+  "entitlementDecision": {
+    "id": "ent_demo_1",
+    "reasonCode": "entitlement.allowed",
+    "reasonText": "plan allows run",
+    "entitled": true
+  },
+  "usageEntry": {
+    "id": "usage_demo_1",
+    "quantity": 1
+  }
+}

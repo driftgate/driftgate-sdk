@@ -1,0 +1,358 @@
+openapi: 3.0.3
+info:
+  title: DriftGate V4 Session Runtime API
+  version: 4.0.0
+  description: |
+    Canonical V4 SDK envelope contract for session start and execution flows.
+servers:
+  - url: https://api.driftgate.ai
+security:
+  - bearerAuth: []
+  - apiKeyAuth: []
+paths:
+  /v4/sessions.start:
+    post:
+      summary: Start a V4 runtime session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SessionStartRequest"
+      responses:
+        "201":
+          description: Session started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionStartEnvelope"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /v4/sessions/{sessionId}/executions.execute:
+    post:
+      summary: Execute input inside existing session
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExecutionRequest"
+      responses:
+        "201":
+          description: Execution created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExecutionEnvelope"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /v4/execute:
+    post:
+      summary: One-liner execution with ephemeral session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EphemeralExecuteRequest"
+      responses:
+        "201":
+          description: Session and execution created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EphemeralExecutionEnvelope"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-driftgate-api-key
+  parameters:
+    SessionId:
+      in: path
+      name: sessionId
+      required: true
+      schema:
+        type: string
+  schemas:
+    PolicyRef:
+      type: object
+      required: [ref, version]
+      properties:
+        ref:
+          type: string
+        version:
+          type: string
+    RouteRef:
+      type: object
+      properties:
+        provider:
+          type: string
+        model:
+          type: string
+        region:
+          type: string
+    RiskMeta:
+      type: object
+      properties:
+        score:
+          type: number
+        decision:
+          type: string
+          enum: [allow, deny, review]
+    TimingMs:
+      type: object
+      required: [total]
+      properties:
+        total:
+          type: number
+        policy:
+          type: number
+        route:
+          type: number
+        tool:
+          type: number
+    ResponseMeta:
+      type: object
+      required: [requestId, timingMs]
+      properties:
+        requestId:
+          type: string
+        sessionId:
+          type: string
+        executionId:
+          type: string
+        lineageId:
+          type: string
+        policy:
+          $ref: "#/components/schemas/PolicyRef"
+        route:
+          $ref: "#/components/schemas/RouteRef"
+        risk:
+          $ref: "#/components/schemas/RiskMeta"
+        timingMs:
+          $ref: "#/components/schemas/TimingMs"
+    CanonicalError:
+      type: object
+      required: [code, message, status, retryable]
+      properties:
+        code:
+          type: string
+          enum:
+            - AUTH_INVALID
+            - POLICY_DENIED
+            - RISK_EXCEEDED
+            - ROUTE_UNAVAILABLE
+            - TOOL_BLOCKED
+            - RATE_LIMITED
+            - TIMEOUT
+            - INTERNAL
+            - INVALID_REQUEST
+        message:
+          type: string
+        status:
+          type: integer
+        retryable:
+          type: boolean
+        details:
+          type: object
+          additionalProperties: true
+    SessionStartRequest:
+      type: object
+      required: [agent]
+      properties:
+        workspaceId:
+          type: string
+        agent:
+          type: string
+        subject:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: true
+        policy:
+          $ref: "#/components/schemas/PolicyRef"
+        route:
+          $ref: "#/components/schemas/RouteRef"
+        risk:
+          $ref: "#/components/schemas/RiskMeta"
+        workflowVersionId:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+    SessionResource:
+      type: object
+      required: [sessionId, workspaceId, agent, createdAt]
+      properties:
+        sessionId:
+          type: string
+        workspaceId:
+          type: string
+        agent:
+          type: string
+        subject:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: true
+        policy:
+          $ref: "#/components/schemas/PolicyRef"
+        route:
+          $ref: "#/components/schemas/RouteRef"
+        risk:
+          $ref: "#/components/schemas/RiskMeta"
+        workflowVersionId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+    ExecutionRequest:
+      type: object
+      required: [input]
+      properties:
+        input:
+          type: object
+          additionalProperties: true
+        policy:
+          $ref: "#/components/schemas/PolicyRef"
+        route:
+          $ref: "#/components/schemas/RouteRef"
+        risk:
+          $ref: "#/components/schemas/RiskMeta"
+        workflowVersionId:
+          type: string
+    ExecutionResult:
+      type: object
+      required: [run, blocked, policyDecisions, entitlementDecision, usageEntry]
+      properties:
+        run:
+          type: object
+          additionalProperties: true
+        approval:
+          type: object
+          nullable: true
+          additionalProperties: true
+        blocked:
+          type: boolean
+        policyDecisions:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        entitlementDecision:
+          type: object
+          additionalProperties: true
+        usageEntry:
+          type: object
+          additionalProperties: true
+        boundaryDecision:
+          type: object
+          nullable: true
+          additionalProperties: true
+        firewallDecision:
+          type: object
+          nullable: true
+          additionalProperties: true
+    EphemeralExecuteRequest:
+      allOf:
+        - $ref: "#/components/schemas/SessionStartRequest"
+        - type: object
+          required: [input]
+          properties:
+            input:
+              type: object
+              additionalProperties: true
+    SessionStartEnvelope:
+      type: object
+      required: [ok, data, meta, error]
+      properties:
+        ok:
+          type: boolean
+          enum: [true]
+        data:
+          type: object
+          required: [session]
+          properties:
+            session:
+              $ref: "#/components/schemas/SessionResource"
+        meta:
+          $ref: "#/components/schemas/ResponseMeta"
+        error:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/CanonicalError"
+    ExecutionEnvelope:
+      type: object
+      required: [ok, data, meta, error]
+      properties:
+        ok:
+          type: boolean
+          enum: [true]
+        data:
+          $ref: "#/components/schemas/ExecutionResult"
+        meta:
+          $ref: "#/components/schemas/ResponseMeta"
+        error:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/CanonicalError"
+    EphemeralExecutionEnvelope:
+      type: object
+      required: [ok, data, meta, error]
+      properties:
+        ok:
+          type: boolean
+          enum: [true]
+        data:
+          type: object
+          required: [session, execution]
+          properties:
+            session:
+              $ref: "#/components/schemas/SessionResource"
+            execution:
+              $ref: "#/components/schemas/ExecutionResult"
+        meta:
+          $ref: "#/components/schemas/ResponseMeta"
+        error:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/CanonicalError"
+    ErrorEnvelope:
+      type: object
+      required: [ok, data, meta, error]
+      properties:
+        ok:
+          type: boolean
+          enum: [false]
+        data:
+          nullable: true
+          type: object
+        meta:
+          $ref: "#/components/schemas/ResponseMeta"
+        error:
+          $ref: "#/components/schemas/CanonicalError"

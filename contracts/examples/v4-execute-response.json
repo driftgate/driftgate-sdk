@@ -1,0 +1,41 @@
+{
+  "ok": true,
+  "data": {
+    "run": {
+      "id": "run_demo_1",
+      "state": "queued"
+    },
+    "approval": null,
+    "blocked": false,
+    "policyDecisions": [],
+    "entitlementDecision": {
+      "id": "ent_demo_1",
+      "reasonCode": "entitlement.allowed",
+      "reasonText": "plan allows run",
+      "entitled": true
+    },
+    "usageEntry": {
+      "id": "usage_demo_1",
+      "quantity": 1
+    },
+    "boundaryDecision": null,
+    "firewallDecision": null
+  },
+  "meta": {
+    "requestId": "req_8f7de15d",
+    "sessionId": "sess_f5dbeef8-9eb3-44d8-a302-9ce19adf49d7",
+    "executionId": "run_demo_1",
+    "lineageId": "run_demo_1",
+    "policy": {
+      "ref": "default",
+      "version": "latest"
+    },
+    "route": {
+      "provider": "default"
+    },
+    "timingMs": {
+      "total": 9.3
+    }
+  },
+  "error": null
+}

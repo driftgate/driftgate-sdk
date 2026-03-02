@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>DriftGate.Sdk</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>DriftGate</Authors>
+    <Company>DriftGate</Company>
+    <Description>DriftGate canonical V4 envelope SDK for .NET.</Description>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://docs.driftgate.ai</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/driftgate/driftgate-sdk</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="../../../README.md" Pack="true" PackagePath="/" Link="README.md" />
+  </ItemGroup>
+</Project>

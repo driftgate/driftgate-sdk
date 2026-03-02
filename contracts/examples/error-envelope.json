@@ -1,0 +1,13 @@
+{
+  "code": "invalid_request",
+  "message": "request payload did not match schema",
+  "correlation_id": "corr-123",
+  "details": [
+    {
+      "path": [
+        "workflowVersionId"
+      ],
+      "message": "Required"
+    }
+  ]
+}

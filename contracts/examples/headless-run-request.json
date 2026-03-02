@@ -1,0 +1,14 @@
+{
+  "workspaceId": "ws_demo_1",
+  "workflowVersionId": "wv_demo_1",
+  "requiresApproval": true,
+  "requiredRole": "approver",
+  "slaPolicyId": "sla_demo",
+  "idempotencyKey": "sdk-request-123",
+  "correlationId": "corr-123",
+  "triggerSource": "sdk",
+  "input": {
+    "invoiceId": "inv_1001",
+    "amountCents": 12500
+  }
+}

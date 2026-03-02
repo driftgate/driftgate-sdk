@@ -1,0 +1,38 @@
+{
+  "name": "driftgate/sdk-php",
+  "description": "DriftGate canonical V4 envelope SDK",
+  "type": "library",
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "DriftGate",
+      "homepage": "https://driftgate.ai"
+    }
+  ],
+  "keywords": [
+    "driftgate",
+    "sdk",
+    "governance",
+    "ai"
+  ],
+  "autoload": {
+    "psr-4": {
+      "DriftGate\\Sdk\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "DriftGate\\Sdk\\Tests\\": "tests/"
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "support": {
+    "docs": "https://docs.driftgate.ai/sdk",
+    "issues": "https://github.com/driftgate/driftgate-sdk/issues",
+    "source": "https://github.com/driftgate/driftgate-sdk"
+  },
+  "require": {
+    "php": ">=8.2"
+  }
+}

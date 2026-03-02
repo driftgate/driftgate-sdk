@@ -1,0 +1,16 @@
+{
+  "ok": false,
+  "data": null,
+  "meta": {
+    "requestId": "req_1f0a2a5f",
+    "timingMs": {
+      "total": 1.2
+    }
+  },
+  "error": {
+    "code": "AUTH_INVALID",
+    "message": "missing authenticated session",
+    "status": 401,
+    "retryable": false
+  }
+}

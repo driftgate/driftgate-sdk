@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "data": {
+    "session": {
+      "sessionId": "sess_f5dbeef8-9eb3-44d8-a302-9ce19adf49d7",
+      "workspaceId": "ws_demo_1",
+      "agent": "refund-agent",
+      "policy": {
+        "ref": "default",
+        "version": "latest"
+      },
+      "route": {
+        "provider": "openai",
+        "model": "gpt-4o-mini",
+        "region": "us-east-1"
+      },
+      "workflowVersionId": "wv_demo_1",
+      "createdAt": "2026-03-01T00:00:00.000Z"
+    }
+  },
+  "meta": {
+    "requestId": "req_3de2c4c6",
+    "sessionId": "sess_f5dbeef8-9eb3-44d8-a302-9ce19adf49d7",
+    "timingMs": {
+      "total": 3.5
+    }
+  },
+  "error": null
+}

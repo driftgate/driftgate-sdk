@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "driftgate-sdk"
+version = "0.1.0"
+description = "DriftGate Python SDK (sync client) for headless governance runtime APIs."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+authors = [
+  { name = "DriftGate" }
+]
+dependencies = [
+  "requests>=2.31.0"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0"
+]
+
+[project.urls]
+Homepage = "https://docs.driftgate.ai"
+Documentation = "https://docs.driftgate.ai/sdk"
+Repository = "https://github.com/driftgate/driftgate-sdk"
+Issues = "https://github.com/driftgate/driftgate-sdk/issues"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
